@@ -1,0 +1,52 @@
+/* 🌐 responsive.css — Common responsive utilities */
+
+/* 🔹 General layout adjustments */
+@media (max-width: 1024px) {
+  .container {
+    padding: 0 30px;
+  }
+  h1 {
+    font-size: 2rem;
+  }
+}
+
+/* 🔹 Tablet view */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    padding: 12px 20px;
+  }
+  .nav-links {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+  }
+  .repo-list {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+}
+
+/* 🔹 Mobile view */
+@media (max-width: 600px) {
+  .navbar .logo img {
+    height: 35px;
+  }
+  .navbar .logo span {
+    font-size: 1.2rem;
+  }
+  .search-box input {
+    width: 90%;
+  }
+  .repo-item {
+    padding: 15px;
+  }
+  h1 {
+    font-size: 1.6rem;
+  }
+}
+
+.hide-mobile { display: none; }
+
+@media (min-width: 601px) {
+  .hide-desktop { display: none; }
+}

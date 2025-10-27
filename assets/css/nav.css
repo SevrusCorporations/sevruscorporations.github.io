@@ -7,12 +7,12 @@
   padding: 0;
 }
 
-/* 🔹 Navbar Styles */
+/* 🔹 Navbar */
 .navbar {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column; /* stack logo above links */
   align-items: center;
-  background: #ffffffcc; /* light frosted white */
+  background: #ffffffcc;
   backdrop-filter: blur(8px);
   padding: 15px 40px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
@@ -22,11 +22,12 @@
   transition: all 0.3s ease;
 }
 
-/* 🔹 Logo */
+/* Logo stays centered above */
 .navbar .logo {
   display: flex;
   align-items: center;
   gap: 10px;
+  margin-bottom: 10px; /* space between logo and nav links */
 }
 
 .navbar .logo img {
@@ -40,10 +41,12 @@
   color: #0077cc;
 }
 
-/* 🔹 Navigation Links */
+/* Links appear in a single horizontal line below logo */
 .nav-links {
   list-style: none;
   display: flex;
+  justify-content: center;
+  flex-wrap: wrap; /* wrap if smaller screens */
   gap: 25px;
 }
 
@@ -62,9 +65,4 @@
 .nav-links a.active {
   color: #0077cc;
   font-weight: 600;
-}
-
-/* 🔹 Optional Hover Glow Effect */
-.navbar:hover {
-  box-shadow: 0 3px 10px rgba(0, 119, 204, 0.08);
 }
