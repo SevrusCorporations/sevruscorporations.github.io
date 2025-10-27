@@ -1,0 +1,260 @@
+/* ===============================
+   SevCorp Contact Page Styling
+   Author: Sevrus
+   =============================== */
+
+/* Reset */
+* {
+  box-sizing: border-box;
+}
+
+/* Body layout */
+body {
+  font-family: "Poppins", sans-serif;
+  color: #333;
+  background: #f4f7fb;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+  flex: 1;
+}
+
+/* 🔹 Contact Hero Section (updated colors for crisp error red) */
+.contact-hero {
+  text-align: center;
+  padding: 100px 20px 60px;
+  /*background: linear-gradient(180deg, #e9f4ff 0%, #f8fbff 100%);*/
+  background: linear-gradient(120deg, #007bff, #00c3ff);
+  color: #1a1a1a;
+  animation: fadeIn 0.6s ease-out;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.contact-hero h1 {
+  font-size: 2.5rem;
+  color: #0077cc;
+  font-weight: 700;
+  margin-bottom: 15px;
+  letter-spacing: 0.5px;
+}
+
+.contact-hero p {
+  font-size: 1.1rem;
+  color: #333;
+  max-width: 600px;
+  margin: 0 auto 30px;
+  line-height: 1.6;
+}
+
+/* 🔹 Notice / Error Message (fixed: true vivid red text) */
+.notice-err {
+  /* very subtle tint background so underlying gradient won't strongly affect text */
+  background: rgba(229, 57, 53, 0.06);       /* light red tint */
+  border: 1px solid rgba(229, 57, 53, 0.18); /* slightly stronger border for definition */
+  color: #d32f2f;                             /* vivid, solid hex (no alpha) */
+  padding: 15px 25px;
+  border-radius: 8px;
+  max-width: 700px;
+  margin: 0 auto;
+  /* keep the glass touch but not so strong that it tints text */
+  /* remove backdrop-filter or keep minimal — if you keep it, prefer very light blur */
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  box-shadow: 0 2px 8px rgba(229, 57, 53, 0.06);
+  animation: fadeInUp 0.8s ease-out;
+  font-weight: 600;       /* stronger weight makes color read as more saturated */
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+.notice-err p {
+  margin: 0;
+  font-size: 0.95rem;
+  /* ensure the paragraph text is the same vivid red */
+  color: #c62828;
+}
+
+/* Contact Section */
+.contact-section {
+  flex: 1;
+  background: #fff;
+  padding: 60px 20px;
+}
+
+.contact-container {
+  display: flex;
+  max-width: 1100px;
+  margin: auto;
+  gap: 60px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+/* Info Panel */
+.contact-info {
+  flex: 1;
+  min-width: 300px;
+  animation: fadeInLeft 1s ease;
+}
+
+.contact-info h2 {
+  color: #007bff;
+  margin-bottom: 10px;
+  font-size: 1.8rem;
+}
+
+.contact-info p {
+  margin-bottom: 20px;
+  color: #555;
+  line-height: 1.6;
+}
+
+.info-box {
+  background: #f0f8ff;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 25px;
+}
+
+.info-box p {
+  margin: 8px 0;
+}
+
+/* Social Links */
+.social-links {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.social-links a {
+  text-decoration: none;
+  color: #007bff;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border: 1px solid #007bff;
+  padding: 8px 16px;
+  border-radius: 25px;
+}
+
+.social-links a:hover {
+  background: #007bff;
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+/* Contact Form */
+.contact-form {
+  flex: 1;
+  min-width: 320px;
+  background: #f9fcff;
+  padding: 30px 25px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 123, 255, 0.05);
+  animation: fadeInRight 1s ease;
+  transition: all 0.3s ease;
+}
+
+/* Input Groups */
+.input-group {
+  position: relative;
+  margin-bottom: 25px;
+}
+
+.input-group input,
+.input-group textarea {
+  width: 100%;
+  border: none;
+  border-bottom: 2px solid #ccc;
+  padding: 10px 0;
+  font-size: 1rem;
+  background: transparent;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.input-group label {
+  position: absolute;
+  top: 10px;
+  left: 0;
+  color: #888;
+  font-size: 1rem;
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+/* Focus animation */
+.input-group input:focus,
+.input-group textarea:focus {
+  border-color: #007bff;
+}
+
+.input-group input:focus + label,
+.input-group input:valid + label,
+.input-group textarea:focus + label,
+.input-group textarea:valid + label {
+  top: -18px;
+  font-size: 0.85rem;
+  color: #007bff;
+}
+
+/* Submit Button */
+.send-btn {
+  background: linear-gradient(90deg, #007bff, #00c3ff);
+  border: none;
+  color: #fff;
+  padding: 12px 25px;
+  font-size: 1rem;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.send-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 10px rgba(0, 123, 255, 0.25);
+}
+
+/* Subtle feedback */
+.contact-form.submitted {
+  transform: scale(0.98);
+  opacity: 0.9;
+}
+
+/* Footer */
+.contact-footer {
+  text-align: center;
+  background: #111;
+  color: #fff;
+  padding: 15px 0;
+  margin-top: auto;
+  font-size: 0.95rem;
+}
+
+.support_link {
+    text-decoration: none;
+    font-weight: bold;
+}
+
+/* Animations */
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInLeft {
+  from { opacity: 0; transform: translateX(-30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fadeInRight {
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
