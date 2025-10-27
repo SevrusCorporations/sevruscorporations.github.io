@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Projects | SevCorp</title>
+  <link rel="stylesheet" href="assets/css/projects.css">
+  <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/SevrusCorporations/SevrusCorp-official/main/src/img/logo.png" />
+</head>
+<body>
+
+  <!-- ✅ Navigation Bar -->
+  <nav class="navbar">
+    <div class="logo">
+      <img src="https://raw.githubusercontent.com/SevrusCorporations/SevrusCorp-official/main/src/img/logo-nobg.png" alt="SevCorp Logo" />
+      <span>SevCorp</span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="#">About</a></li>
+      <li><a href="projects.html" class="active">Projects</a></li>
+      <li><a href="#">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- ✅ Main Content -->
+  <main class="projects-container">
+    <h1>My Projects</h1>
+
+    <div class="search-box">
+      <input type="text" id="search-input" placeholder="Search projects by name or description..." />
+    </div>
+
+    <ul id="repo-list" class="repo-list"></ul>
+
+    <div class="pagination">
+      <button id="prev-page" disabled>Previous</button>
+      <span id="page-info">Page 1</span>
+      <button id="next-page">Next</button>
+    </div>
+  </main>
+
+  <!-- 🔹 Modal -->
+  <div id="repo-modal" class="repo-modal hidden">
+    <div class="repo-modal-content">
+      <span id="close-modal" class="close-btn">&times;</span>
+      <div id="modal-body">Loading...</div>
+    </div>
+  </div>
+<script>
+  const username = "SevrusCorporations";
+  const repoList = document.getElementById("repo-list");
+  const prevBtn = document.getElementById("prev-page");
+  const nextBtn = document.getElementById("next-page");
+  const pageInfo = document.getElementById("page-info");
+  const searchInput = document.getElementById("search-input");
+  const modal = document.getElementById("repo-modal");
+  const modalBody = document.getElementById("modal-body");
+  const closeModal = document.getElementById("close-modal");
+
+  let currentPage = 1;
+  const perPage = 8;
+  let pageRepos = [];
+
+  function escapeHtml(str) {
+    return String(str || "").replace(/&/g, "&amp;")
+                            .replace(/</g, "&lt;")
+                            .replace(/>/g, "&gt;")
+                            .replace(/"/g, "&quot;")
+                            .replace(/'/g, "&#039;");
+  }
+
+  async function fetchRepos(page = 1) {
+    repoList.innerHTML = "<p class='loading'>Loading...</p>";
+    pageInfo.textContent = `Page ${page}`;
+    try {
+      const url = `https://api.github.com/users/${username}/repos?sort=updated&per_page=${perPage}&page=${page}`;
+      const response = await fetch(url);
+      const data = await response.json();
+
+      if (!Array.isArray(data)) {
+        const message = data && data.message ? escapeHtml(data.message) : "Error fetching repositories.";
+        repoList.innerHTML = `<p class='error'>${message}</p>`;
+        prevBtn.disabled = page === 1;
+        nextBtn.disabled = true;
+        return;
+      }
+
+      pageRepos = data;
+      renderRepos(pageRepos);
+      prevBtn.disabled = page === 1;
+      nextBtn.disabled = data.length < perPage;
+      pageInfo.textContent = `Page ${page}`;
+    } catch (err) {
+      console.error(err);
+      repoList.innerHTML = "<p class='error'>Network error loading repositories.</p>";
+      prevBtn.disabled = page === 1;
+      nextBtn.disabled = true;
+    }
+  }
+
+  function formatTime(updatedAt) {
+    const updatedDate = new Date(updatedAt);
+    const now = new Date();
+    const diffMs = now - updatedDate;
+    const diffMins = Math.floor(diffMs / (1000 * 60));
+    const diffHrs = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHrs / 24);
+
+    if (diffMins < 1) return "just now";
+    if (diffMins < 60) return `${diffMins} minute${diffMins !== 1 ? "s" : ""} ago`;
+    if (diffHrs < 24) return `${diffHrs} hour${diffHrs !== 1 ? "s" : ""} ago`;
+    if (diffDays < 30) return `${diffDays} day${diffDays !== 1 ? "s" : ""} ago`;
+    if (diffDays < 365) return `${Math.floor(diffDays / 30)} month${Math.floor(diffDays / 30) !== 1 ? "s" : ""} ago`;
+    return `${Math.floor(diffDays / 365)} year${Math.floor(diffDays / 365) !== 1 ? "s" : ""} ago`;
+  }
+
+  function renderRepos(repos, { indicateFiltered = false } = {}) {
+    if (!repos || repos.length === 0) {
+      repoList.innerHTML = "<p>No repositories found.</p>";
+      pageInfo.textContent = indicateFiltered ? "Filtered results" : `Page ${currentPage}`;
+      prevBtn.disabled = indicateFiltered || currentPage === 1;
+      nextBtn.disabled = indicateFiltered || repos.length < perPage;
+      return;
+    }
+
+    repoList.innerHTML = repos.map(repo => {
+      const name = escapeHtml(repo.name);
+      const desc = repo.description ? escapeHtml(repo.description) : "No description provided.";
+      const starHtml = repo.stargazers_count > 0 ? `<span class="stars">⭐ ${repo.stargazers_count}</span>` : "";
+      return `
+        <li class="repo-item" data-repo-name="${name}">
+          <div class="repo-header">
+            <h2><a href="${repo.html_url}" target="_blank" rel="noopener noreferrer">${name}</a></h2>
+            ${starHtml}
+          </div>
+          <p class="repo-desc">${desc}</p>
+          <div class="repo-meta">🕒 Updated ${formatTime(repo.updated_at)}</div>
+        </li>
+      `;
+    }).join("");
+
+    document.querySelectorAll(".repo-item").forEach(item => {
+      item.addEventListener("click", (e) => {
+        if (e.target.closest("a")) return;
+        const repoName = item.dataset.repoName;
+        if (repoName) openRepoModal(repoName);
+      });
+    });
+
+    pageInfo.textContent = indicateFiltered ? "Filtered results" : `Page ${currentPage}`;
+    prevBtn.disabled = indicateFiltered || currentPage === 1;
+    nextBtn.disabled = indicateFiltered || (repos.length < perPage);
+  }
+
+  // ✅ Updated: check if a repo has GitHub Pages enabled
+  async function checkForPages(repoName) {
+    const possibleUrl = `https://${username}.github.io/${repoName}/`;
+
+    // Also consider main pages repo (username.github.io)
+    if (repoName.toLowerCase() === `${username.toLowerCase()}.github.io`) {
+      return `https://${username}.github.io/`;
+    }
+
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 2500);
+      const resp = await fetch(possibleUrl, { method: "HEAD", signal: controller.signal });
+      clearTimeout(timeout);
+      if (resp.ok) return possibleUrl;
+    } catch (err) {
+      // fallback GET (in case HEAD is blocked)
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 2500);
+        const resp = await fetch(possibleUrl, { method: "GET", signal: controller.signal });
+        clearTimeout(timeout);
+        if (resp.ok) return possibleUrl;
+      } catch (_) {}
+    }
+
+    return null;
+  }
+
+  async function openRepoModal(repoName) {
+    modal.classList.remove("hidden");
+    modalBody.innerHTML = "<p class='loading'>Loading project details...</p>";
+
+    try {
+      const url = `https://api.github.com/repos/${username}/${encodeURIComponent(repoName)}`;
+      const resp = await fetch(url);
+      if (!resp.ok) {
+        modalBody.innerHTML = "<p class='error'>Failed to load repository details.</p>";
+        return;
+      }
+      const repo = await resp.json();
+
+      // Check for GitHub Pages availability
+      let pagesUrl = null;
+      modalBody.innerHTML = "<p>Loading project details... (checking live demo)</p>";
+      pagesUrl = await checkForPages(repoName);
+
+      const description = repo.description ? escapeHtml(repo.description) : "No description available.";
+      const language = repo.language ? escapeHtml(repo.language) : "N/A";
+      const stars = repo.stargazers_count ?? 0;
+      const updated = formatTime(repo.updated_at);
+      const visibility = repo.private ? "Private" : "Public";
+
+      modalBody.innerHTML = `
+        <h2>${escapeHtml(repo.name)}</h2>
+        <p>${description}</p>
+        <ul class="repo-details">
+          <li><strong>Language:</strong> ${language}</li>
+          <li><strong>Stars:</strong> ${stars}</li>
+          <li><strong>Last Updated:</strong> ${updated}</li>
+          <li><strong>Visibility:</strong> ${visibility}</li>
+          <li><strong>Forks:</strong> ${repo.forks_count ?? 0}</li>
+        </ul>
+        <div class="modal-actions">
+          <a href="${repo.html_url}" target="_blank" class="github-btn" rel="noopener noreferrer">View on GitHub</a>
+          ${pagesUrl ? `<a href="${pagesUrl}" target="_blank" class="live-btn" rel="noopener noreferrer">Visit Project</a>` : ""}
+        </div>
+      `;
+    } catch (err) {
+      console.error(err);
+      modalBody.innerHTML = "<p class='error'>Failed to load repository details.</p>";
+    }
+  }
+
+  function closeRepoModal() {
+    modal.classList.add("hidden");
+  }
+
+  closeModal.addEventListener("click", closeRepoModal);
+  window.addEventListener("click", (e) => {
+    if (e.target === modal) closeRepoModal();
+  });
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeRepoModal();
+  });
+
+  prevBtn.addEventListener("click", () => {
+    if (currentPage > 1) {
+      currentPage--;
+      fetchRepos(currentPage);
+      searchInput.value = "";
+    }
+  });
+
+  nextBtn.addEventListener("click", () => {
+    currentPage++;
+    fetchRepos(currentPage);
+    searchInput.value = "";
+  });
+
+  let searchDebounce = null;
+  searchInput.addEventListener("input", () => {
+    clearTimeout(searchDebounce);
+    searchDebounce = setTimeout(() => {
+      const q = searchInput.value.toLowerCase().trim();
+      if (!q) {
+        renderRepos(pageRepos, { indicateFiltered: false });
+        return;
+      }
+      const filtered = pageRepos.filter(repo => {
+        const name = (repo.name || "").toLowerCase();
+        const desc = (repo.description || "").toLowerCase();
+        return name.includes(q) || desc.includes(q);
+      });
+      renderRepos(filtered, { indicateFiltered: true });
+    }, 180);
+  });
+
+  fetchRepos(currentPage);
+</script>
+</body>
+</html>
